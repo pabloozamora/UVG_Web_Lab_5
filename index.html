@@ -4,11 +4,240 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 5t</title>
+    <title>Lab 5</title>
 </head>
 <body>
     <script type="application/javascript">
-      // su código
+      document.body.style.fontFamily = 'Helvetica'
+      document.body.style.backgroundColor = '#40302C'
+
+      //Variables globales
+      let currentMessagesCount = 0
+      let username = 'usuarioRandom'
+
+      //Estilo scroll
+      let styleElement = document.createElement("style")
+      styleElement.appendChild(document.createTextNode("div ::-webkit-scrollbar {-webkit-appearance: none;width: 7px;}div ::-webkit-scrollbar-thumb {border-radius: 2px;background-color: white;}div ::-webkit-scrollbar-track {background-color: #5C453F;}"))
+      document.getElementsByTagName("head")[0].appendChild(styleElement);
+
+      //Alerta de nuevos mensajes
+      const alert = document.createElement('div')
+      alert.style.visibility = 'hidden'
+      alert.innerHTML = 'Nuevos mensajes ▼'
+      alert.style.position = 'absolute'
+      alert.style.left = '40%'
+      alert.style.width = '20%'
+      alert.style.padding = '2px'
+      alert.style.textAlign = 'center'
+      alert.style.fontSize = '2.2vh'
+      alert.style.backgroundColor = '#E55B3D'
+      alert.style.color = 'white'
+      alert.style.borderRadius = '3px'
+      document.body.appendChild(alert)
+
+      //Creación del contenedor del chat
+      const chatContainer = document.createElement('div')
+      document.body.appendChild(chatContainer)
+      chatContainer.style.display = 'flex'
+      chatContainer.style.flexDirection = 'column'
+      chatContainer.style.justifyContent = 'center'
+      chatContainer.style.padding = '20px'
+      chatContainer.style.fontSize = '1.5vw'
+      
+      //Display de mensajes
+      const display = document.createElement('div')
+      display.style.display = 'flex'
+      display.style.maxHeight = '300px'
+      display.style.flexDirection = 'column'
+      display.style.overflowX = 'hidden'
+      display.style.overflowY = 'auto'
+      display.style.overflow.color = 'red'
+      chatContainer.append(display)
+
+      //Area para redactar mensaje
+      const messageInput = document.createElement('div')
+      messageInput.style.display = 'flex'
+      messageInput.style.flexDirection = 'row'
+      messageInput.style.alignItems = 'center'
+      messageInput.style.margin = "5px"
+
+      //Text input
+      const input = document.createElement('textarea')
+      input.style.resize = 'none'
+      input.maxLength = '140'
+      input.style.width = '80%'
+      input.style.overflowX = 'hidden'
+      input.style.overflowY = 'auto'
+      input.style.maxHeight = '4vw'
+      input.style.fontSize = '1.5vw'
+      input.style.backgroundColor = '#5C453F'
+      input.style.color = 'white'
+      input.style.borderRadius = '3px'
+
+      //Boton
+      const button = document.createElement('button')
+      button.style.height = input.height
+      button.append('Enviar')
+      button.style.width = '20%'
+      button.style.marginLeft = '10px'
+      button.style.padding = '7px'
+      button.style.backgroundColor = '#5C453F'
+      button.style.color = 'white'
+      button.style.borderRadius = '3px'
+      button.style.borderWidth = '1px'
+
+      //Contador de caracteres
+      let characterCount = 0
+      characterCountDisplay = document.createElement('div')
+      characterCountDisplay.innerHTML = `0/140`
+      characterCountDisplay.style.marginLeft = '5px'
+      characterCountDisplay.style.color = 'white'
+      
+      input.addEventListener('input', (event) => {
+        characterCount = event.target.value.length
+        characterCountDisplay.innerHTML = `${characterCount}/140`
+      })
+      
+      messageInput.append(input)
+      messageInput.append(button)
+      chatContainer.append(messageInput)
+      chatContainer.append(characterCountDisplay)
+
+      //Crear elemento de mensaje
+      const createMessage = (user, text, createdOn) => {
+        const message = document.createElement('article')
+        message.style.width = '70%'
+        message.style.display = 'flex'
+        message.style.flexDirection = 'column'
+        message.style.backgroundColor = '#5C453F'
+        message.style.color = '#F8F8F8'
+        message.style.borderRadius = '5px'
+        message.style.margin = "5px"
+        message.style.padding = "10px"
+        
+        const userSpan = document.createElement('span')
+        //username
+        userSpan.append(user)
+        userSpan.style.fontWeight = 'bold'
+        userSpan.style.marginBottom = '5px'
+        message.append(userSpan)
+
+        //Verificar si el texto es URL de imagen
+        if (text.match(/^https?:\/\/.+\/.+$/)){
+          img = doesImageExist(text)
+          if (img != null){
+            img.style.marginTop = '5px'
+            img.style.marginBottom = '5px'
+            message.append(img)
+          }
+        }
+
+        //texto
+        const textSpan = document.createElement('span')
+        textSpan.append(text)
+        message.append(textSpan)
+        textSpan.style.overflowWrap = 'break-word'
+
+        //fecha de envío
+        const dateSpan = document.createElement('span')
+        dateSpan.style.marginTop = '5px'
+        dateSpan.style.alignSelf = 'end'
+        dateSpan.append(createdOn)
+        message.append(dateSpan)
+
+        if (user === username) {
+          message.style.alignSelf = 'end'
+        }
+
+        return message
+      }
+
+      //Funcion para verificar si una imagen existe
+      const doesImageExist = (url) => {
+        try{
+          const img = document.createElement('IMG')
+          img.src = url
+          return img
+        }
+        catch{
+          return null
+        }
+      }
+
+      //Desplegar todos los mensajes actualmente en la API
+      const getMessages = async () => {
+        const response = await fetch('http://uvgenios.online/api/messages')
+        const messages = await response.json()
+        console.log("Mensajes encontrados")
+        currentMessagesCount = messages.length
+        messagesList = messages.map((message) => createMessage(message.user, message.text, message.created_on))
+        messagesList.forEach((article) => display.appendChild(article))
+        display.scrollTop = display.scrollHeight
+        checkNewMessages()
+      }
+
+      //Refresh de mensajes
+      const checkNewMessages = async () => {
+        const response = await fetch('http://uvgenios.online/api/messages')
+        const messages = await response.json()
+        if (messages.length > currentMessagesCount){
+          currentMessagesCount = messages.length
+          console.log("Nuevo mensaje")
+          newMessage = messages[Object.keys(messages)[Object.keys(messages).length - 1]]
+          console.log(newMessage)
+          display.appendChild(createMessage(newMessage.user, newMessage.text, newMessage.created_on))
+          if (newMessage.user === username){
+            display.scrollTop = display.scrollHeight
+          }
+          else{
+            newMessageAlert()
+          }
+        }
+        if ((display.scrollTop  + 350) > display.scrollHeight){
+          alert.style.visibility = 'hidden'
+        }
+        checkNewMessages() //Recursión para que la función se llame a sí misma constantemente
+      }
+
+      const newMessageAlert = () => {
+        alert.style.visibility = 'visible'
+      }
+
+      //Enviar mensaje a la API
+      const postMessage = async (text) => {
+        const body = {
+          created_on: Date(),
+          text: text,
+          user: username
+        }
+        const response = await fetch('http://uvgenios.online/api/messages', {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        return response
+      }
+
+      //Enviar mensaje con botón
+      button.addEventListener('click', async (event) => {
+        event.preventDefault()
+        await postMessage(input.value)
+        input.value = ''
+      })
+
+      //Enviar mensaje con 'enter'
+      input.addEventListener("keydown", async (event) =>{
+        if (event.key === 'Enter'){
+          event.preventDefault()
+          await postMessage(input.value)
+          input.value = ''
+        }
+      })
+
+      getMessages()
+
     </script>
 </body>
 </html>
