@@ -13,11 +13,11 @@
 
       //Variables globales
       let currentMessagesCount = 0
-      let username = 'usuarioRandom'
+      let username = 'pabloozamora'
 
       //Estilo scroll
       let styleElement = document.createElement("style")
-      styleElement.appendChild(document.createTextNode("div ::-webkit-scrollbar {-webkit-appearance: none;width: 7px;}div ::-webkit-scrollbar-thumb {border-radius: 2px;background-color: white;}div ::-webkit-scrollbar-track {background-color: #5C453F;}"))
+      styleElement.appendChild(document.createTextNode("div ::-webkit-scrollbar {-webkit-appearance: none;width: 12px;}div ::-webkit-scrollbar-thumb {border-radius: 2px;background-color: white;}div ::-webkit-scrollbar-track {background-color: #5C453F;}"))
       document.getElementsByTagName("head")[0].appendChild(styleElement);
 
       //Alerta de nuevos mensajes
@@ -47,7 +47,7 @@
       //Display de mensajes
       const display = document.createElement('div')
       display.style.display = 'flex'
-      display.style.maxHeight = '300px'
+      display.style.maxHeight = '600px'
       display.style.flexDirection = 'column'
       display.style.overflowX = 'hidden'
       display.style.overflowY = 'auto'
@@ -65,7 +65,7 @@
       const input = document.createElement('textarea')
       input.style.resize = 'none'
       input.maxLength = '140'
-      input.style.width = '80%'
+      input.style.width = '85%'
       input.style.overflowX = 'hidden'
       input.style.overflowY = 'auto'
       input.style.maxHeight = '4vw'
@@ -78,13 +78,14 @@
       const button = document.createElement('button')
       button.style.height = input.height
       button.append('Enviar')
-      button.style.width = '20%'
+      button.style.width = '13%'
       button.style.marginLeft = '10px'
-      button.style.padding = '7px'
+      button.style.padding = '15px'
       button.style.backgroundColor = '#5C453F'
       button.style.color = 'white'
       button.style.borderRadius = '3px'
       button.style.borderWidth = '1px'
+      button.style.fontSize = '3vh'
 
       //Contador de caracteres
       let characterCount = 0
@@ -193,7 +194,7 @@
             newMessageAlert()
           }
         }
-        if ((display.scrollTop  + 350) > display.scrollHeight){
+        if ((display.scrollTop  + display.clientHeight + 50) > display.scrollHeight){
           alert.style.visibility = 'hidden'
         }
         checkNewMessages() //Recursión para que la función se llame a sí misma constantemente
